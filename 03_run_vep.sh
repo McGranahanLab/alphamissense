@@ -50,6 +50,7 @@ for tumour_input_dir in "${VEP_INPUT_DIR}"/${TUMOUR_GLOB}; do
       -i "${CONTAINER_WORKDIR}/input/vep/${WORK_COHORT_NAME}/${tumour_id}/${tumour_id}_muttable.vcf" \
       -o "${CONTAINER_WORKDIR}/output/vep/${WORK_COHORT_NAME}/${tumour_id}/${tumour_id}_muttable_annotated.tsv" \
       --cache --offline \
+      --cache_version "${VEP_CACHE_VERSION}" \
       --dir_cache "${CONTAINER_WORKDIR}/_assets" \
       --assembly "${VEP_ASSEMBLY}" \
       --tab \

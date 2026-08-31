@@ -42,7 +42,10 @@ if [[ ! -f "${ALPHAMISSENSE_FILE}.tbi" ]]; then
   tabix -s 1 -b 2 -e 2 -S 1 -f "${ALPHAMISSENSE_FILE}"
 fi
 
-if [[ ! -d "${WORK_ASSETS_DIR}/${VEP_SPECIES}" ]]; then
+cache_dir_a="${WORK_ASSETS_DIR}/${VEP_SPECIES}/${VEP_CACHE_VERSION}_${VEP_ASSEMBLY}"
+cache_dir_b="${WORK_ASSETS_DIR}/${VEP_SPECIES}_vep_${VEP_CACHE_VERSION}_${VEP_ASSEMBLY}"
+
+if [[ ! -d "${cache_dir_a}" && ! -d "${cache_dir_b}" ]]; then
   echo "Downloading VEP cache into ${WORK_ASSETS_DIR}"
   "${APPTAINER_BIN}" exec \
     --env "HOME=${CONTAINER_WORKDIR}" \
@@ -55,6 +58,8 @@ if [[ ! -d "${WORK_ASSETS_DIR}/${VEP_SPECIES}" ]]; then
       -c "${CONTAINER_WORKDIR}/_assets" \
       -d "${CONTAINER_WORKDIR}/_assets" \
       --CACHE_VERSION "${VEP_CACHE_VERSION}"
+else
+  echo "Found VEP cache for ${VEP_SPECIES} ${VEP_CACHE_VERSION} ${VEP_ASSEMBLY}"
 fi
 
 echo "Asset preparation complete"
