@@ -23,7 +23,7 @@ echo "Splitting mutation table by tumour_id"
 "${PYTHON_BIN}" "${SPLIT_MUTTABLE_SCRIPT}" \
   --input "${MUTTABLE_TABLE}" \
   --output-dir "${SPLIT_INPUT_DIR}" \
-  --tumour-column tumour_id \
+  --tumour-column patient_tumour \
   --filename-template "{tumour_id}_muttable.tsv" \
   --gzip-output "${SPLIT_COMPRESS_GZIP}"
 
