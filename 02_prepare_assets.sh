@@ -9,6 +9,8 @@ if [[ ! -f "${CONFIG_FILE}" ]]; then
   exit 1
 fi
 
+ml Singularity/3.11.3
+
 # shellcheck source=/dev/null
 source "${CONFIG_FILE}"
 
