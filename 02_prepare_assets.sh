@@ -43,12 +43,14 @@ fi
 if [[ ! -d "${WORK_ASSETS_DIR}/${VEP_SPECIES}" ]]; then
   echo "Downloading VEP cache into ${WORK_ASSETS_DIR}"
   "${APPTAINER_BIN}" exec \
+    --env "HOME=${CONTAINER_WORKDIR}" \
     --bind "${WORK_ROOT}:${CONTAINER_WORKDIR}" \
     "${image_ref}" \
     perl /opt/vep/src/ensembl-vep/INSTALL.pl \
       -a c \
       -s "${VEP_SPECIES}" \
       -y "${VEP_ASSEMBLY}" \
+      -c "${CONTAINER_WORKDIR}/_assets" \
       -d "${CONTAINER_WORKDIR}/_assets" \
       --CACHE_VERSION "${VEP_CACHE_VERSION}"
 fi
