@@ -88,6 +88,23 @@ def _detect_delimiter(handle) -> str:
     return ","
 
 
+def _chrom_sort_key(chrom: str) -> tuple[int, int | str]:
+    value = chrom.strip()
+    if value.lower().startswith("chr"):
+        value = value[3:]
+    upper = value.upper()
+
+    if upper == "X":
+        return (0, 23)
+    if upper == "Y":
+        return (0, 24)
+    if upper in {"M", "MT"}:
+        return (0, 25)
+    if value.isdigit():
+        return (0, int(value))
+    return (1, upper)
+
+
 def convert_to_vcf(
     input_file: Path,
     output_file: Path,
@@ -99,7 +116,7 @@ def convert_to_vcf(
     """
 
     fields_to_use = info_fields if info_fields is not None else DEFAULT_INFO_FIELDS
-    emitted = 0
+    records: list[tuple[str, int, str]] = []
 
     with _open_text_file(input_file) as infile, output_file.open(
         "w", encoding="utf-8"
@@ -121,10 +138,15 @@ def convert_to_vcf(
                 continue
 
             info_field = build_info_field(row, fields_to_use)
-            outfile.write(f"{chrom}\t{pos}\t{tid}\t{ref}\t{alt}\t.\tPASS\t{info_field}\n")
-            emitted += 1
+            pos_int = int(pos)
+            line = f"{chrom}\t{pos}\t{tid}\t{ref}\t{alt}\t.\tPASS\t{info_field}\n"
+            records.append((chrom, pos_int, line))
 
-    return emitted
+        records.sort(key=lambda x: (_chrom_sort_key(x[0]), x[1]))
+        for _, __, line in records:
+            outfile.write(line)
+
+    return len(records)
 
 
 def parse_args() -> argparse.Namespace:

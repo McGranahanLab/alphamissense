@@ -9,10 +9,28 @@ if [[ ! -f "${CONFIG_FILE}" ]]; then
   exit 1
 fi
 
-ml Singularity/3.11.3
-
 # shellcheck source=/dev/null
 source "${CONFIG_FILE}"
+
+if [[ "${LOAD_CONTAINER_MODULE:-false}" == "true" ]] && ! command -v "${APPTAINER_BIN}" >/dev/null 2>&1; then
+  if command -v ml >/dev/null 2>&1; then
+    ml "${CONTAINER_MODULE}"
+  else
+    if ! command -v module >/dev/null 2>&1 && [[ -f /etc/profile.d/modules.sh ]]; then
+      # shellcheck source=/dev/null
+      source /etc/profile.d/modules.sh
+    fi
+    if command -v module >/dev/null 2>&1; then
+      module load "${CONTAINER_MODULE}"
+    fi
+  fi
+fi
+
+if ! command -v "${APPTAINER_BIN}" >/dev/null 2>&1; then
+  echo "Container runtime not found: ${APPTAINER_BIN}" >&2
+  echo "Tried module load: ${CONTAINER_MODULE}" >&2
+  exit 1
+fi
 
 mkdir -p "${WORK_ASSETS_DIR}"
 
